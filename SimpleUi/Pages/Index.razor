@@ -1,0 +1,58 @@
+﻿@page "/"
+@inject IGuestData GuestData
+@if (data is not null)
+
+{
+   
+        @foreach (var item in data)
+        {
+            <div class="row">
+
+                <div class="col-md-6">
+                    <h2>@item.Id @item.FirstName @item.LastName</h2>
+
+                </div>
+
+            <div class="col-md-6">
+                <button class="btn-secondary" @onclick="@(e=>Add(item))" >add</button>
+                <button class="btn-danger" @onclick="@(e=>Delete(item))">delete</button>
+                <button class="btn-warning" @onclick="@(e=>Update(item))">update</button>
+
+            </div>
+            </div>
+        }
+   
+    
+}
+@code{
+    private List<GuestModel> data;
+
+    protected override async Task OnInitializedAsync()
+    {
+        data= await GuestData.GetGuests();
+    }
+    private async Task Add(GuestModel guest)
+    {
+        await GuestData.CreateGuests(new GuestModel
+            {
+                Id = data.Count + 1,
+                FirstName = guest.FirstName,
+                LastName = guest.LastName
+            });
+        data = await GuestData.GetGuests();
+    }
+    private async Task Update(GuestModel guest)
+    {
+        guest.LastName = "rayak";
+        await GuestData.UpdateGuests(guest.Id, guest);
+       data =await GuestData.GetGuests();
+
+    }
+    private async Task Delete(GuestModel guest)
+    {
+        
+        await GuestData.DeleteGuests(guest.Id);
+        data = await GuestData.GetGuests();
+
+    }
+}
